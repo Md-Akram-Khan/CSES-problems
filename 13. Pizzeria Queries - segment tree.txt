@@ -1,0 +1,127 @@
+#include<bits/stdc++.h>
+using namespace std;
+#define nl                      "\n"
+#define ff                      first
+#define ss                      second
+#define ll                      long long int
+#define pb                      push_back
+#define cceil(a, b)             (((a) + (b) - 1) / (b))
+#define sqr(x)                  ((x)*(x))
+#define pi                      acos(-1)
+#define gcd(x,y)                __gcd(x,y)
+#define lcm(x,y)                ((x * y) / gcd(x,y))
+#define all(x)                  (x).begin(), (x).end()
+#define sorta(x)                sort(all(x))
+#define sortd(x)                sort(all(x), greater<int>())
+#define max3(x,y,z)             max({x, y, z})
+#define max4(x,y,z,zz)          max({x, y, z, zz})
+#define maxm(x)                 *max_element(all(x))
+#define min3(x,y,z)             min({x, y, z})
+#define min4(x,y,z,zz)          min({x, y, z, zz})
+#define minm(x)                 *min_element(all(x))
+#define valid(nx,ny,row,col)    (nx >= 1 && nx <= row && ny >= 1 && ny <= col)
+#define yes                     cout << "Yes" << nl
+#define yess                    cout << "YES" << nl
+#define no                      cout << "No" << nl
+#define noo                     cout << "NO" << nl
+#define mone                    cout << -1 << nl
+#define alice                   cout << "Alice" << nl
+#define bob                     cout << "Bob" << nl
+#define multiple_test           int test; cin >> test; while(test--) { solve(); }
+#define single_test             solve();
+#define space                   >> ' ' >>
+ 
+const int MOD = 1e9 + 7;
+ 
+using pairi     = pair<int, int>;
+using pairl     = pair<ll, ll>;
+using mapi      = map<int, int>;
+using vi        = vector<int>;
+using vl        = vector<ll>;
+using vvi       = vector<vi>;
+using vvl       = vector<vl>;
+using vpi       = vector<pairi>;
+using vpl       = vector<pairl>;
+using si        = set<int>;
+using qi        = queue<int>;
+using pqia      = priority_queue<int>;
+using pqid      = priority_queue<int, vector<int>, greater<int>>;
+ 
+vector<ll> a, down_value, up_value;
+ 
+void build(int at, int l, int r) {
+    if(l == r) {
+        down_value[at] = a[l] - l;
+        up_value[at] = a[l] + l;
+        return;
+    }
+    int mid = (l + r) / 2;
+    build(at * 2, l, mid);
+    build(at * 2 + 1, mid + 1, r);
+    down_value[at] = min(down_value[at * 2], down_value[at * 2 + 1]);
+    up_value[at] = min(up_value[at * 2], up_value[at * 2 + 1]);
+}
+ 
+void update(int at, int l, int r, int pos, ll val) {
+    if(l == r)
+    {
+        down_value[at] = val - l;
+        up_value[at] = val + l;
+        return;
+    }
+    int mid = (l + r) / 2;
+    if(l <= pos && pos <= mid)
+        update(at * 2, l, mid, pos, val);
+    else
+        update(at * 2 + 1, mid + 1, r, pos, val);
+    down_value[at] = min(down_value[at * 2], down_value[at * 2 + 1]);
+    up_value[at] = min(up_value[at * 2], up_value[at * 2 + 1]);
+}
+ 
+ll query_down(int at, int l, int r, int ql, int qr) {
+    if(l > qr || r < ql) return LLONG_MAX;
+    if(l >= ql && r <= qr) return down_value[at];
+    int mid = (l + r) / 2;
+    return min(query_down(at * 2, l, mid, ql, qr), query_down(at * 2 + 1, mid + 1, r, ql, qr));
+}
+ 
+ll query_up(int at, int l, int r, int ql, int qr) {
+    if(l > qr || r < ql) return LLONG_MAX;
+    if(l >= ql && r <= qr) return up_value[at];
+    int mid = (l + r) / 2;
+    return min(query_up(at * 2, l, mid, ql, qr), query_up(at * 2 + 1, mid + 1, r, ql, qr));
+}
+ 
+void solve() {
+    int n, q;
+    cin >> n >> q;
+    a.resize(n + 1);
+    down_value.resize(4 * n, 0);
+    up_value.resize(4 * n, 0);
+    for(int i = 1; i <= n; i++) cin >> a[i];
+    build(1, 1, n);
+    while(q--) {
+        int p;
+        cin >> p;
+        if(p == 1) {
+            int k;
+            ll x;
+            cin >> k >> x;
+            update(1, 1, n, k, x);
+            a[k] = x;
+        } else {
+            int k;
+            cin >> k;
+            ll down_res = query_down(1, 1, n, 1, k) + k;
+            ll up_res = query_up(1, 1, n, k, n) - k;
+            cout << min(down_res, up_res) << endl;
+        }
+    }
+}
+ 
+int main() {
+    ios::sync_with_stdio(0); cin.tie(0); cout.tie(0);
+    //multiple_test
+    single_test
+    return 0;
+}

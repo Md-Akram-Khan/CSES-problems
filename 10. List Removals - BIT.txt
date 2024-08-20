@@ -1,0 +1,59 @@
+#include<bits/stdc++.h>
+#define ll long long int
+using namespace std;
+class FenwickTree {
+private:
+    vector<ll> tree;
+    int MaxVal;
+public:
+    FenwickTree(int size) {
+        MaxVal = size;
+        tree.resize(size + 1, 0);
+    }
+    void update(int idx, ll val) {
+        while (idx <= MaxVal) {
+            tree[idx] += val;
+            idx += (idx & -idx);
+        }
+    }
+    ll read(int idx) {
+        ll sum = 0;
+        while (idx > 0) {
+            sum += tree[idx];
+            idx -= (idx & -idx);
+        }
+        return sum;
+    }
+};
+ 
+int main() {
+    int n;
+    cin >> n;
+    vector<int>a(n + 1), b(n + 1);
+    FenwickTree bit(n);
+ 
+    for (int i = 1; i <= n; ++i) {
+        cin >> a[i];
+        b[i] = i;
+    }
+    for(int i = 0; i < n; i++)
+    {
+        int p;
+        cin>>p;
+        int l = 1, r = n, ind = p;
+        while(l <= r)
+        {
+            int mid = l + (r - l) / 2;
+            if(b[mid] + bit.read(mid) >= p)
+            {
+                r = mid - 1;
+                ind = mid;
+            }
+            else
+                l = mid + 1;
+        }
+        cout<<a[ind]<<' ';
+        bit.update(ind, -1);
+    }
+    cout<<endl;
+}

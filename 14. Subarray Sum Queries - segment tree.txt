@@ -1,0 +1,130 @@
+#include<bits/stdc++.h>
+using namespace std;
+#define nl                      "\n"
+#define ff                      first
+#define ss                      second
+#define ll                      long long int
+#define pb                      push_back
+#define cceil(a, b)             (((a) + (b) - 1) / (b))
+#define sqr(x)                  ((x)*(x))
+#define pi                      acos(-1)
+#define gcd(x,y)                __gcd(x,y)
+#define lcm(x,y)                ((x * y) / gcd(x,y))
+#define all(x)                  (x).begin(), (x).end()
+#define sorta(x)                sort(all(x))
+#define sortd(x)                sort(all(x), greater<int>())
+#define max3(x,y,z)             max({x, y, z})
+#define max4(x,y,z,zz)          max({x, y, z, zz})
+#define maxm(x)                 *max_element(all(x))
+#define min3(x,y,z)             min({x, y, z})
+#define min4(x,y,z,zz)          min({x, y, z, zz})
+#define minm(x)                 *min_element(all(x))
+#define valid(nx,ny,row,col)    (nx >= 1 && nx <= row && ny >= 1 && ny <= col)
+#define yes                     cout << "Yes" << nl
+#define yess                    cout << "YES" << nl
+#define no                      cout << "No" << nl
+#define noo                     cout << "NO" << nl
+#define mone                    cout << -1 << nl
+#define alice                   cout << "Alice" << nl
+#define bob                     cout << "Bob" << nl
+#define multiple_test           int test; cin >> test; while(test--) { solve(); }
+#define single_test             solve();
+#define space                   >> ' ' >>
+ 
+const int MOD = 1e9 + 7;
+ 
+using pairi     = pair<int, int>;
+using pairl     = pair<ll, ll>;
+using mapi      = map<int, int>;
+using vi        = vector<int>;
+using vl        = vector<ll>;
+using vvi       = vector<vi>;
+using vvl       = vector<vl>;
+using vpi       = vector<pairi>;
+using vpl       = vector<pairl>;
+using si        = set<int>;
+using qi        = queue<int>;
+using pqia      = priority_queue<int>;
+using pqid      = priority_queue<int, vector<int>, greater<int>>;
+ 
+struct SegTree {
+    vector<ll> arr;
+    vector<ll> max_value, pre_value, suf_value, sum_value;
+ 
+    SegTree(vector<ll>& a) {
+        arr = a;
+        int n = a.size();
+        max_value.resize(4 * n, 0);
+        pre_value.resize(4 * n, 0);
+        suf_value.resize(4 * n, 0);
+        sum_value.resize(4 * n, 0);
+        build(1, 0, n - 1);
+    }
+ 
+    void build(int at, int l, int r) {
+        if(l == r) {
+            max_value[at] = arr[l];
+            pre_value[at] = arr[l];
+            suf_value[at] = arr[l];
+            sum_value[at] = arr[l];
+            return;
+        }
+        int mid = (l + r) / 2;
+        build(at * 2, l, mid);
+        build(at * 2 + 1, mid + 1, r);
+        pull(at);
+    }
+ 
+    void pull(int at) {
+        max_value[at] = max({max_value[at * 2], max_value[at * 2 + 1], suf_value[at * 2] + pre_value[at * 2 + 1]});
+        sum_value[at] = sum_value[at * 2] + sum_value[at * 2 + 1];
+        pre_value[at] = max(pre_value[at * 2], sum_value[at * 2] + pre_value[at * 2 + 1]);
+        suf_value[at] = max(suf_value[at * 2 + 1], sum_value[at * 2 + 1] + suf_value[at * 2]);
+    }
+ 
+    void update(int at, int l, int r, int pos, ll val) {
+        if(l == r) {
+            max_value[at] = val;
+            pre_value[at] = val;
+            suf_value[at] = val;
+            sum_value[at] = val;
+            return;
+        }
+        int mid = (l + r) / 2;
+        if(pos <= mid)
+            update(at * 2, l, mid, pos, val);
+        else
+            update(at * 2 + 1, mid + 1, r, pos, val);
+        pull(at);
+    }
+ 
+    ll update(int pos, ll val) {
+        update(1, 0, arr.size() - 1, pos, val);
+        return max_value[1];
+    }
+};
+ 
+void solve() {
+    int n, q;
+    cin >> n >> q;
+ 
+    vector<ll> arr(n);
+    for(int i = 0; i < n; i++) {
+        cin >> arr[i];
+    }
+ 
+    SegTree st(arr);
+    while(q--) {
+        int k;
+        ll x;
+        cin >> k >> x;
+        k--;
+        cout << max(0ll, st.update(k, x)) << nl;
+    }
+}
+ 
+int main() {
+    ios::sync_with_stdio(0); cin.tie(0); cout.tie(0);
+    single_test
+    return 0;
+}
